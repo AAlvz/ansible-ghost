@@ -56,14 +56,6 @@ Internal variables, avoid changing:
 * `ghost_fetch_url`: URL used for fetching Ghost. Defaults to `https://ghost.org/zip/ghost-latest.zip`.
 * `ghost_fetch_dir`: Directory to store the Ghost zip. Defaults to `/tmp`.
 
-Local Testing
--------
-
-Tests can be ran on Debian Wheezy and Ubuntu Trusty boxes by executing "vagrant up". There are the following ENV variables:
-
-* `ANSIBLE_TAGS`: A list of tags, comma-separated, that will be ran by Ansible. Defaults to `all`.
-* `ANSIBLE_VERBOSE`: Ansible's verbosity level. Defaults to `v`.
-
 Example Playbook
 ----------------
 

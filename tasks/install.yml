@@ -17,6 +17,20 @@
   notify: ghost - restart service
   sudo: yes
 
+- name: configure database
+  stat: path={{ inventory_dir }}/host_files/{{ inventory_hostname }}/ghost.db
+  register: p
+
+- name: configure Add provided database
+  copy:
+    src={{ inventory_dir }}/host_files/{{ inventory_hostname }}/ghost.db
+    dest=/opt/tinker/shared_files/ghost/content/data/ghost.db
+    owner="{{ ghost_user_name }}"
+    group="{{ ghost_user_group }}"
+    mode=644
+  when: p.stat.exists
+  sudo: yes
+
 - name: install - add init script
   template:
     src: init.ghost.j2

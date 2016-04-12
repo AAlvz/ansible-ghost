@@ -56,6 +56,16 @@ Internal variables, avoid changing:
 * `ghost_fetch_url`: URL used for fetching Ghost. Defaults to `https://ghost.org/zip/ghost-latest.zip`.
 * `ghost_fetch_dir`: Directory to store the Ghost zip. Defaults to `/tmp`.
 
+
+Configs Database
+----------------
+
+If you add your ghost.db to `{{ inventory_file }}/host_files/{{ hostname}}/ghost.db`
+the file will be imported to your ghost blog. (That will import posts, configs, etc)
+
+**USE THIS WITH CAUTION** Will replace your current database.
+Currently it has only been tested with sqlite3
+
 Example Playbook
 ----------------
 

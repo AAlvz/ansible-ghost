@@ -6,6 +6,7 @@ ghost_user_group: ghost
 ghost_database_name: "ghost.db"
 ghost_config_url: http://{{ ghost_config_server.host }}:{{ ghost_config_server.port }}
 ghost_config_mail: {}
+mysql_ghost_password: pass
 ghost_config_database:
   client: "sqlite3"
   connection:

@@ -1,11 +1,12 @@
 ---
-ghost_install_dir: /var/www/ghost
-
+ghost_install_dir: "/opt/tinker/shared_files/ghost"
+ghost_running_port: 2368
 ghost_user_name: ghost
 ghost_user_group: ghost
-
+ghost_database_name: "ghost.db"
 ghost_config_url: http://{{ ghost_config_server.host }}:{{ ghost_config_server.port }}
 ghost_config_mail: {}
+mysql_ghost_password: pass
 ghost_config_database:
   client: "sqlite3"
   connection:
@@ -13,7 +14,7 @@ ghost_config_database:
   debug: "false"
 ghost_config_server:
   host: "127.0.0.1"
-  port: "2368"
+  port: "{{ ghost_running_port }}"
 
 nodejs_version: 'nodejs-v010'
 ghost_nodejs_enabled: no

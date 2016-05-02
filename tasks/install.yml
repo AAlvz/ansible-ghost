@@ -1,12 +1,4 @@
 ---
-- name: install - install Ghost
-  npm:
-    path: "{{ ghost_install_dir }}"
-    production: yes
-    state: present
-  sudo_user: "{{ ghost_user_name }}"
-  sudo: yes
-
 - name: install - add configurations
   template:
     src: config.js.j2
@@ -17,19 +9,37 @@
   notify: ghost - restart service
   sudo: yes
 
+- name: install - install Ghost
+  npm:
+    path: "{{ ghost_install_dir }}"
+    production: yes
+    state: present
+  sudo_user: "{{ ghost_user_name }}"
+  sudo: yes
+
 - name: configure database
-  local_action: stat path="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/ghost.db"
+  local_action: stat path="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}"
   register: p
 
-- name: configure Add provided database
+- name: configure Add provided sqlite3 database
   copy:
-    src={{ inventory_dir }}/host_files/{{ inventory_hostname }}/ghost.db
-    dest=/opt/tinker/shared_files/ghost/content/data/ghost.db
+    src={{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}
+    dest="{{ ghost_install_dir }}/content/data/{{ ghost_database_name }}"
     owner="{{ ghost_user_name }}"
     group="{{ ghost_user_group }}"
     mode=644
-  when: p.stat.exists
+  when: (p.stat.exists) and (ghost_config_database.client == "sqlite3")
   sudo: yes
+
+- name: Populate mysql database
+  mysql_db:
+    name={{ ghost_database_name }}
+    state=import
+    target="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}"
+    login_user="{{ ghost_user_name }}"
+    login_password="{{ mysql_ghost_password }}"
+  when: (p.stat.exists) and (ghost_config_database.client == "mysql")
+  ignore_errors: yes
 
 - name: install - add init script
   template:
@@ -46,4 +56,3 @@
     enabled: yes
     state: restarted
   sudo: yes
-

@@ -63,11 +63,17 @@
   when: ghost_repo is defined
   sudo: true
 
+- name: prepare - Add the remot host public key
+  shell: ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts
+  sudo: yes
+
 - name: prepare - clone Ghost files
   git:
     repo="{{ ghost_repo }}"
     dest="{{ ghost_install_dir }}"
     force=yes
+    accept_hostkey=True
+    key_file=/home/"{{ ghost_user_name }}"/.ssh/id_rsa
   when: ghost_repo is defined
   sudo: yes
 

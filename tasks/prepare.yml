@@ -70,7 +70,7 @@
 - name: prepare - clone Ghost files
   git:
     repo="{{ ghost_repo }}"
-    dest="{{ ghost_install_dir }}"
+    dest="{{ ghost_install_dir }}/{{ ghost_repo | basename }}"
     force=yes
     accept_hostkey=True
     key_file=/home/"{{ ghost_user_name }}"/.ssh/id_rsa

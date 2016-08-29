@@ -2,7 +2,7 @@
 - name: install - add configurations
   template:
     src: config.js.j2
-    dest: "{{ ghost_install_dir }}/config.js"
+    dest: "{{ ghost_install_dir }}/{{ ghost_repo | basename }}/config.js"
     owner: "{{ ghost_user_name }}"
     group: "{{ ghost_user_group }}"
     mode: 0644
@@ -11,7 +11,7 @@
 
 - name: install - install Ghost
   npm:
-    path: "{{ ghost_install_dir }}"
+    path: "{{ ghost_install_dir }}/{{ ghost_repo | basename }}"
     production: yes
     state: present
   sudo_user: "{{ ghost_user_name }}"

@@ -1,5 +1,7 @@
 ---
-ghost_install_dir: "/opt/tinker/shared_files/ghost"
+ghost_repos_path: "/opt/tinker/shared_files/ghost"
+ghost_install_dir: "{{ ghost_repos_path }}/{{ ghost_repo | basename }}"
+ghost_repo: "https://github.com/TryGhost/Ghost.git"
 ghost_running_port: 2368
 ghost_user_name: ghost
 ghost_user_group: ghost
@@ -24,7 +26,7 @@ ghost_user_name: 'ghost'
 ghost_user_group: 'ghost'
 nginx_remove_default_vhost: true
 nginx_vhosts:
-  - server_name: "blog.tinkerware.io"
+  - server_name: "_"
     listen: "80"
     extra_parameters: |
       location / {

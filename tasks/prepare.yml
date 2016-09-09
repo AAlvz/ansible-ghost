@@ -1,27 +1,27 @@
 ---
-- name: prepare - install unzip
-  apt:
-    pkg: unzip
-    update_cache: yes
-    cache_valid_time: 3600
-    state: installed
-  sudo: yes
+# - name: prepare - install unzip
+#   apt:
+#     pkg: unzip
+#     update_cache: yes
+#     cache_valid_time: 3600
+#     state: installed
+#   sudo: yes
 
-- name: prepare - fetch Ghost
-  get_url:
-    url: "{{ ghost_fetch_url }}"
-    dest: "{{ ghost_fetch_dir }}/ghost.zip"
-    mode: 0644
-  when: ghost_repo is not defined
+# - name: prepare - fetch Ghost
+#   get_url:
+#     url: "{{ ghost_fetch_url }}"
+#     dest: "{{ ghost_fetch_dir }}/ghost.zip"
+#     mode: 0644
+#   when: ghost_repo is not defined
 
 - name: prepare - check if Ghost installation path exists
   stat:
-    path: "{{ ghost_install_dir }}"
+    path: "{{ ghost_repos_path }}"
   register: ghost_check_install_dir
 
 - name: prepare - create Ghost installation path if necessary
   file:
-    dest: "{{ ghost_install_dir }}"
+    dest: "{{ ghost_repos_path }}"
     owner: root
     group: root
     mode: 0755
@@ -47,16 +47,16 @@
     state: present
   sudo: yes
 
-- name: prepare - unzip Ghost
-  unarchive:
-    src: "{{ ghost_fetch_dir }}/ghost.zip"
-    dest: "{{ ghost_install_dir }}"
-    owner: "{{ ghost_user_name }}"
-    group: "{{ ghost_user_group }}"
-    copy: no
-    creates: "{{ ghost_install_dir }}/index.js"
-  when: ghost_repo is not defined
-  sudo: yes
+# - name: prepare - unzip Ghost
+#   unarchive:
+#     src: "{{ ghost_fetch_dir }}/ghost.zip"
+#     dest: "{{ ghost_install_dir }}"
+#     owner: "{{ ghost_user_name }}"
+#     group: "{{ ghost_user_group }}"
+#     copy: no
+#     creates: "{{ ghost_install_dir }}/index.js"
+#   when: ghost_repo is not defined
+#   sudo: yes
 
 - name: Ensure git is installed
   apt: name=git state=present
@@ -70,7 +70,7 @@
 - name: prepare - clone Ghost files
   git:
     repo="{{ ghost_repo }}"
-    dest="{{ ghost_install_dir }}/{{ ghost_repo | basename }}"
+    dest="{{ ghost_install_dir }}"
     force=yes
     accept_hostkey=True
     key_file=/home/"{{ ghost_user_name }}"/.ssh/id_rsa

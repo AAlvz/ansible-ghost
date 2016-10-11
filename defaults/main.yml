@@ -1,6 +1,6 @@
 ---
-ghost_repos_path: "/opt/tinker/shared_files/ghost"
-ghost_install_dir: "{{ ghost_repos_path }}/{{ ghost_repo | basename }}"
+ghost_repos_path: "/opt/tinker/shared_files/ghost/"
+ghost_install_dir: "{{ ghost_repos_path }}{{ ghost_repo | basename }}"
 ghost_repo: ""
 ghost_running_port: 2368
 ghost_user_name: ghost

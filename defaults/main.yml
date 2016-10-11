@@ -12,7 +12,7 @@ mysql_ghost_password: pass
 ghost_config_database:
   client: "sqlite3"
   connection:
-    filename: "{{ ghost_install_dir }}/content/data/ghost.db"
+    filename: "{{ ghost_install_dir }}content/data/ghost.db"
   debug: "false"
 ghost_config_server:
   host: "0.0.0.0"

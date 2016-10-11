@@ -73,7 +73,7 @@
     dest="{{ ghost_install_dir }}"
     force=yes
     accept_hostkey=True
-    key_file=/home/"{{ ghost_user_name }}"/.ssh/id_rsa
+    key_file="/home/{{ ghost_user_name }}/.ssh/{{ ghost_repo_ssh_key_name }}"
   when: ghost_repo != ""
   sudo: yes
 

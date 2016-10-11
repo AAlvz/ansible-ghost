@@ -2,7 +2,7 @@
 - name: install - add configurations
   template:
     src: config.js.j2
-    dest: "{{ ghost_install_dir }}/config.js"
+    dest: "{{ ghost_install_dir }}config.js"
     owner: "{{ ghost_user_name }}"
     group: "{{ ghost_user_group }}"
     mode: 0644

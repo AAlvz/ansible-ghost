@@ -12,7 +12,7 @@
     url: "{{ ghost_fetch_url }}"
     dest: "{{ ghost_fetch_dir }}/ghost.zip"
     mode: 0644
-  when: ghost_repo == ""
+  when: ghost_repo == "https://github.com/TryGhost/Ghost"
 
 - name: prepare - check if Ghost installation path exists
   stat:
@@ -55,12 +55,12 @@
     group: "{{ ghost_user_group }}"
     copy: no
     creates: "{{ ghost_install_dir }}/index.js"
-  when: ghost_repo == ""
+  when: ghost_repo == "https://github.com/TryGhost/Ghost"
   sudo: yes
 
 - name: Ensure git is installed
   apt: name=git state=present
-  when: ghost_repo != ""
+  when: ghost_repo != "https://github.com/TryGhost/Ghost"
   sudo: true
 
 - name: prepare - Add the remot host public key
@@ -74,7 +74,7 @@
     force=yes
     accept_hostkey=True
     key_file="/home/{{ ghost_user_name }}/.ssh/{{ ghost_repo_ssh_key_name }}"
-  when: ghost_repo != ""
+  when: ghost_repo != "https://github.com/TryGhost/Ghost"
   sudo: yes
 
 - name: prepare - Make sure user owns folders

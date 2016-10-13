@@ -20,7 +20,7 @@
 - name: configure database
   local_action: stat path="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}"
   register: p
-  sudo: yes
+  sudo: no
 
 - name: configure Add provided sqlite3 database
   copy:

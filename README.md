@@ -5,7 +5,7 @@ Installs Ghost, a blogging platform. By default it'll install the latest Ghost
 version available from [Ghost's homepage](https://ghost.org)
 but you can specify a git repository if you have Ghost under version control.
 
-This role also takes care of Ghost's [issue #2639](https://github.com/TryGhost/Ghost/issues/2639) 
+This role also takes care of Ghost's [issue #2639](https://github.com/TryGhost/Ghost/issues/2639)
 on hosts using libc 2.13 or older, making sure that npm's sqlite3 is compiled
 beforehand. This has been tested and verified to work on Debian Wheezy.
 
@@ -33,9 +33,9 @@ git clone https://github.com/Tinker-Ware/ansible-ghost-blog.git  {{ inventory_di
 
     - hosts: ghost_server
       roles:
-         - { role: nodejs, sudo: yes }
+         - { role: nodejs, become: yes }
          - role: ghost
-         - { role: nginx, sudo: yes }
+         - { role: nginx, become: yes }
 
 
 Role Variables
@@ -74,9 +74,9 @@ Example Playbook
 
     - hosts: ghost_server
       roles:
-         - { role: nodejs, sudo: yes }
+         - { role: nodejs, become: yes }
          - role: ghost
-         - { role: nginx, sudo: yes }
+         - { role: nginx, become: yes }
 
 `{{ inventory_dir }}/host_vars/ghost_server`
 

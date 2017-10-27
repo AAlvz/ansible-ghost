@@ -5,7 +5,7 @@
     update_cache: yes
     cache_valid_time: 3600
     state: installed
-  sudo: yes
+  become: yes
 
 - name: prepare - fetch Ghost
   get_url:
@@ -26,7 +26,7 @@
     group: root
     mode: 0755
     state: directory
-  sudo: yes
+  become: yes
   when: not ghost_check_install_dir.stat.exists
 
 - name: prepare - add Ghost group
@@ -34,7 +34,7 @@
     name: "{{ ghost_user_group }}"
     system: yes
     state: present
-  sudo: yes
+  become: yes
 
 - name: prepare - add Ghost user
   user:
@@ -45,7 +45,7 @@
     shell: /bin/bash
     system: yes
     state: present
-  sudo: yes
+  become: yes
 
 - name: prepare - unzip Ghost
   unarchive:
@@ -56,16 +56,16 @@
     copy: no
     creates: "{{ ghost_install_dir }}/index.js"
   when: ghost_repo == "https://github.com/TryGhost/Ghost"
-  sudo: yes
+  become: yes
 
 - name: Ensure git is installed
   apt: name=git state=present
   when: ghost_repo != "https://github.com/TryGhost/Ghost"
-  sudo: true
+  become: true
 
 - name: prepare - Add the remot host public key
   shell: ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts
-  sudo: yes
+  become: yes
 
 - name: prepare - clone Ghost files
   git:
@@ -75,7 +75,7 @@
     accept_hostkey=True
     key_file="/home/{{ ghost_user_name }}/.ssh/{{ ghost_repo_ssh_key_name }}"
   when: ghost_repo != "https://github.com/TryGhost/Ghost"
-  sudo: yes
+  become: yes
 
 - name: prepare - Make sure user owns folders
   file:
@@ -84,4 +84,4 @@
     group: "{{ ghost_user_group }}"
     recurse: yes
     state: directory
-  sudo: yes
+  become: yes

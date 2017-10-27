@@ -22,8 +22,6 @@ ghost_config_server:
 nodejs_version: 'nodejs-v010'
 ghost_nodejs_enabled: no
 ghost_nginx_enabled: no
-ghost_user_name: 'ghost'
-ghost_user_group: 'ghost'
 nginx_remove_default_vhost: true
 nginx_vhosts:
   - server_name: "_"

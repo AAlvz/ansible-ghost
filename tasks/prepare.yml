@@ -36,6 +36,10 @@
     state: present
   become: yes
 
+- name: search for ghost user
+  shell: "awk -F: -v v={{ ghost_user_name }} '{if ($1==v) print $1}' /etc/passwd"
+  register: command_result
+
 - name: prepare - add Ghost user
   user:
     name: "{{ ghost_user_name }}"
@@ -46,6 +50,7 @@
     system: yes
     state: present
   become: yes
+  when: command_result.stdout == ""
 
 - name: prepare - unzip Ghost
   unarchive:

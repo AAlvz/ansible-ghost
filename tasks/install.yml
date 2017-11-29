@@ -5,7 +5,6 @@
     name: ghost-cli
     global: yes
   become: yes
-  become_user: "{{ ghost_user_name }}"
 
 # Install last Ghost version without the interactive setup
 - name: Ghost | Install Last Ghost Version
@@ -35,8 +34,8 @@
   command: "yarn --production"
   args:
     chdir: "{{ ghost_install_dir }}/{{ ghost_directory }}/current"
-  sudo: yes
-  sudo_user: "{{ ghost_user_name }}"
+  become: yes
+  become_user: "{{ ghost_user_name }}"
   when: (g.stat.exists)
 
 # Setup Ghost - needs to not be interactive

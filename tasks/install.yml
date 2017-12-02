@@ -4,6 +4,7 @@
   npm:
     name: ghost-cli
     global: yes
+    state: latest
   become: yes
 
 # Install last Ghost version without the interactive setup

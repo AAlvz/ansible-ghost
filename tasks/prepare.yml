@@ -1,19 +1,4 @@
 ---
-- name: prepare - install unzip
-  apt:
-    pkg: unzip
-    update_cache: yes
-    cache_valid_time: 3600
-    state: installed
-  sudo: yes
-
-- name: prepare - fetch Ghost
-  get_url:
-    url: "{{ ghost_fetch_url }}"
-    dest: "{{ ghost_fetch_dir }}/ghost.zip"
-    mode: 0644
-  when: ghost_repo == "https://github.com/TryGhost/Ghost"
-
 - name: prepare - check if Ghost installation path exists
   stat:
     path: "{{ ghost_repos_path }}"
@@ -26,7 +11,7 @@
     group: root
     mode: 0755
     state: directory
-  sudo: yes
+  become: yes
   when: not ghost_check_install_dir.stat.exists
 
 - name: prepare - add Ghost group
@@ -34,7 +19,11 @@
     name: "{{ ghost_user_group }}"
     system: yes
     state: present
-  sudo: yes
+  become: yes
+
+- name: search for ghost user
+  shell: "awk -F: -v v={{ ghost_user_name }} '{if ($1==v) print $1}' /etc/passwd"
+  register: command_result
 
 - name: prepare - add Ghost user
   user:
@@ -45,37 +34,27 @@
     shell: /bin/bash
     system: yes
     state: present
-  sudo: yes
-
-- name: prepare - unzip Ghost
-  unarchive:
-    src: "{{ ghost_fetch_dir }}/ghost.zip"
-    dest: "{{ ghost_install_dir }}"
-    owner: "{{ ghost_user_name }}"
-    group: "{{ ghost_user_group }}"
-    copy: no
-    creates: "{{ ghost_install_dir }}/index.js"
-  when: ghost_repo == "https://github.com/TryGhost/Ghost"
-  sudo: yes
+  become: yes
+  when: command_result.stdout == ""
 
 - name: Ensure git is installed
   apt: name=git state=present
-  when: ghost_repo != "https://github.com/TryGhost/Ghost"
-  sudo: true
+  when: ghost_repo != ""
+  become: true
 
 - name: prepare - Add the remot host public key
   shell: ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts
-  sudo: yes
+  become: yes
 
 - name: prepare - clone Ghost files
   git:
     repo="{{ ghost_repo }}"
-    dest="{{ ghost_install_dir }}"
+    dest="{{ ghost_install_dir }}/{{ ghost_repo | basename }}"
     force=yes
     accept_hostkey=True
     key_file="/home/{{ ghost_user_name }}/.ssh/{{ ghost_repo_ssh_key_name }}"
-  when: ghost_repo != "https://github.com/TryGhost/Ghost"
-  sudo: yes
+  when: ghost_repo != ""
+  become: yes
 
 - name: prepare - Make sure user owns folders
   file:
@@ -84,4 +63,5 @@
     group: "{{ ghost_user_group }}"
     recurse: yes
     state: directory
-  sudo: yes
+  when: ghost_repo != ""
+  become: yes

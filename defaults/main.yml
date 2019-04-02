@@ -1,7 +1,10 @@
 ---
 ghost_repos_path: "/opt/tinker/shared_files/ghost"
-ghost_install_dir: "{{ ghost_repos_path }}/{{ ghost_repo | basename }}"
-ghost_repo: "https://github.com/TryGhost/Ghost.git"
+ghost_directory: "ghost"
+ghost_install_dir: "{{ ghost_repos_path }}"
+ghost_repo: ""
+ghost_log_filename: ""
+ghost_version: ""
 ghost_repo_ssh_key_name: id_rsa
 ghost_running_port: 2368
 ghost_user_name: ghost
@@ -22,8 +25,6 @@ ghost_config_server:
 nodejs_version: 'nodejs-v010'
 ghost_nodejs_enabled: no
 ghost_nginx_enabled: no
-ghost_user_name: 'ghost'
-ghost_user_group: 'ghost'
 nginx_remove_default_vhost: true
 nginx_vhosts:
   - server_name: "_"

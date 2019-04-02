@@ -1,59 +1,83 @@
 ---
-- name: install - add configurations
-  template:
-    src: config.js.j2
-    dest: "{{ ghost_repos_path }}/{{ ghost_repo | basename }}/config.js"
-    owner: "{{ ghost_user_name }}"
-    group: "{{ ghost_user_group }}"
-    mode: 0644
-  notify: ghost - restart service
-  sudo: yes
-
-- name: install - install Ghost
+# Install Ghost-CLI
+- name: Ghost CLI | Install "ghost-cli" node.js package globally.
   npm:
-    path: "{{ ghost_install_dir }}"
-    production: yes
-    state: present
-  sudo_user: "{{ ghost_user_name }}"
-  sudo: yes
+    name: ghost-cli
+    global: yes
+    state: latest
+  become: yes
+
+# Install last Ghost version without the interactive setup
+- name: Ghost | Install Last Ghost Version
+  shell: "ghost install --dir={{ghost_directory}} --no-stack --no-setup"
+  args:
+    chdir: "{{ ghost_install_dir }}"
+  when: ghost_repo == "" and ghost_version == ""
+  become: yes
+  become_user: "{{ ghost_user_name }}"
+
+- name: Register folder status
+  local_action: stat path="{{ ghost_install_dir }}/{{ ghost_directory }}"
+  register: g
+  become: no
+
+# Install a sepecific Ghost version without the interactive setup
+- name: Ghost | Install Specific Ghost Version
+  shell: "ghost install --dir={{ghost_directory}} --version={{ghost_version}} --no-stack --no-setup"
+  args:
+    chdir: "{{ ghost_install_dir }}"
+  when: (not g.stat.exists) and ghost_repo == "" and ghost_version != ""
+  become: yes
+  become_user: "{{ ghost_user_name }}"
+
+# Install dependencies
+- name: Install node dependencies
+  command: "yarn --production"
+  args:
+    chdir: "{{ ghost_install_dir }}/{{ ghost_directory }}/current"
+  become: yes
+  become_user: "{{ ghost_user_name }}"
+  when: (g.stat.exists)
+
+# Setup Ghost - needs to not be interactive
+- name: Ghost | Configure Ghost
+  shell: "ghost config --url={{ghost_config_url}} --db={{ghost_config_database.client}} --dbhost=localhost --dbuser={{ghost_user_name}} --dbpass=tinker --dbname={{ghost_database_name}} --no-setup-nginx --no-setup-mysql --port={{ghost_running_port}} --dir={{ghost_install_dir}}/{{ghost_directory}} --no-setup-systemd  --no-setup-linux-user --no-start"
+  args:
+    chdir: "{{ ghost_install_dir }}/{{ ghost_directory }}"
+  become: yes
+  become_user: "{{ ghost_user_name }}"
 
 - name: configure database
-  local_action: stat path="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}"
+  local_action: stat path="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}.sql"
   register: p
-  sudo: no
-
-- name: configure Add provided sqlite3 database
-  copy:
-    src={{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}
-    dest="{{ ghost_install_dir }}/content/data/{{ ghost_database_name }}"
-    owner="{{ ghost_user_name }}"
-    group="{{ ghost_user_group }}"
-    mode=644
-  when: (p.stat.exists) and (ghost_config_database.client == "sqlite3")
-  sudo: yes
+  become: no
 
 - name: Populate mysql database
   mysql_db:
     name={{ ghost_database_name }}
     state=import
-    target="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}"
+    target="{{ inventory_dir }}/host_files/{{ inventory_hostname }}/{{ ghost_database_name }}.sql"
     login_user="{{ ghost_user_name }}"
-    login_password="{{ mysql_ghost_password }}"
+    login_password="tinker"
   when: (p.stat.exists) and (ghost_config_database.client == "mysql")
   ignore_errors: yes
 
-- name: install - add init script
-  template:
-    src: init.ghost.j2
-    dest: /etc/init.d/ghost
-    owner: root
-    group: root
-    mode: 0755
-  sudo: yes
+# Save log in default filename
+- name: Start production
+  shell: "nohup ghost run --production 0<&- &> /tmp/ghost.log &"
+  args:
+    chdir: "{{ ghost_install_dir }}/{{ ghost_directory }}"
+    executable: /bin/bash
+  when: ghost_log_filename == ""
+  become: yes
+  become_user: "{{ ghost_user_name }}"
 
-- name: install - enable Ghost service
-  service:
-    name: ghost
-    enabled: yes
-    state: restarted
-  sudo: yes
+# Save log in a specific filename
+- name: Start production
+  shell: "nohup ghost run --production 0<&- &> /tmp/{{ghost_log_filename}} &"
+  args:
+    chdir: "{{ ghost_install_dir }}/{{ ghost_directory }}"
+    executable: /bin/bash
+  when: ghost_log_filename != ""
+  become: yes
+  become_user: "{{ ghost_user_name }}"
